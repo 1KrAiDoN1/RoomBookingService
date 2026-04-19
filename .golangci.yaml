@@ -9,4 +9,4 @@ linters:
     - errcheck
     - govet
     - ineffassign
-    - staticchecks
+    - staticcheck
