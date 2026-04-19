@@ -46,3 +46,5 @@ type ConferenceClientInterface interface {
 type TransactionManagerInterface interface {
 	Do(ctx context.Context, fn func(ctx context.Context) error) error
 }
+
+//go:generate go run go.uber.org/mock/mockgen@v0.6.0 -destination=mocks/auth_mocks.go -package=mocks internship/internal/service AuthRepositoryInterface,JWTManagerInterface
