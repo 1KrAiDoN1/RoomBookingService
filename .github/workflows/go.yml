@@ -22,10 +22,11 @@ jobs:
       - name: Сборка бинарника
         run: go build -v -o app ./cmd/app/main.go
 
+
       - name: Проверка линтера
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: latest
+          version: v2.11.4
           args: --config=.golangci.yaml --verbose ./...
 
       - name: Тесты auth_service_test
