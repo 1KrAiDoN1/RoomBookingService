@@ -1,5 +1,3 @@
-# Три шага: сборка бинарника → линтер → unit-тесты auth (auth_service_test.go).
-
 name: Go
 
 on:
