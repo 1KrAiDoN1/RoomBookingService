@@ -1,0 +1,76 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: room_booking_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-admin}
+      POSTGRES_DB: ${DB_NAME:-room_booking}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: room_booking_migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_DRIVER: ${DB_DRIVER:-postgres}
+      DB_HOST: postgres
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-admin}
+      DB_NAME: ${DB_NAME:-room_booking}
+    volumes:
+      - ./migrations:/app/migrations
+      - ./scripts/migrate.sh:/app/scripts/migrate.sh
+    entrypoint: ["/bin/sh", "/app/scripts/migrate.sh"]
+    networks:
+      - app_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: room_booking_app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      SERVER_ADDRESS: ${SERVER_ADDRESS:-:8080}
+      SERVER_READ_TIMEOUT: ${SERVER_READ_TIMEOUT:-15s}
+      SERVER_WRITE_TIMEOUT: ${SERVER_WRITE_TIMEOUT:-15s}
+      SERVER_IDLE_TIMEOUT: ${SERVER_IDLE_TIMEOUT:-120s}
+      SERVER_SHUTDOWN_TIMEOUT: ${SERVER_SHUTDOWN_TIMEOUT:-30s}
+      DB_DRIVER: ${DB_DRIVER:-postgres}
+      DB_HOST: postgres
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-admin}
+      DB_NAME: ${DB_NAME:-room_booking}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-test-secret-key-for-ci}
+      TOKEN_TTL: ${TOKEN_TTL:-24h}
+    ports:
+      - "8080:8080"
+    networks:
+      - app_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge

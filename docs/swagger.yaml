@@ -1,0 +1,545 @@
+definitions:
+  internal_http-server_handler.ErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  internal_http-server_handler.InternalErrorResponse:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.BookingData:
+    properties:
+      conferenceLink:
+        type: string
+      createdAt:
+        type: string
+      slotId:
+        type: string
+      status:
+        type: string
+      userId:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.CancelBookingResponse:
+    properties:
+      booking:
+        $ref: '#/definitions/internship_internal_models_dto_handler.BookingData'
+    type: object
+  internship_internal_models_dto_handler.CreateBookingRequest:
+    properties:
+      createConferenceLink:
+        type: boolean
+      slotId:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.CreateBookingResponse:
+    properties:
+      booking:
+        $ref: '#/definitions/internship_internal_models_dto_handler.BookingData'
+    type: object
+  internship_internal_models_dto_handler.CreateRoomRequest:
+    properties:
+      capacity:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.CreateRoomResponse:
+    properties:
+      room:
+        $ref: '#/definitions/internship_internal_models_dto_handler.RoomData'
+    type: object
+  internship_internal_models_dto_handler.CreateScheduleRequest:
+    properties:
+      daysOfWeek:
+        items:
+          type: integer
+        type: array
+      endTime:
+        type: string
+      startTime:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.CreateScheduleResponse:
+    properties:
+      schedule:
+        $ref: '#/definitions/internship_internal_models_dto_handler.ScheduleData'
+    type: object
+  internship_internal_models_dto_handler.DummyLoginRequest:
+    properties:
+      role:
+        description: admin, user
+        type: string
+    type: object
+  internship_internal_models_dto_handler.ListBookingsResponse:
+    properties:
+      bookings:
+        items:
+          $ref: '#/definitions/internship_internal_models_dto_handler.BookingData'
+        type: array
+      pagination:
+        $ref: '#/definitions/internship_internal_models_dto_handler.PaginationQuery'
+    type: object
+  internship_internal_models_dto_handler.ListRoomsResponse:
+    properties:
+      rooms:
+        items:
+          $ref: '#/definitions/internship_internal_models_dto_handler.RoomData'
+        type: array
+    type: object
+  internship_internal_models_dto_handler.ListSlotsResponse:
+    properties:
+      slots:
+        items:
+          $ref: '#/definitions/internship_internal_models_dto_handler.SlotData'
+        type: array
+    type: object
+  internship_internal_models_dto_handler.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.PaginationQuery:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    type: object
+  internship_internal_models_dto_handler.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.RegisterResponse:
+    properties:
+      user:
+        $ref: '#/definitions/internship_internal_models_dto_handler.UserData'
+    type: object
+  internship_internal_models_dto_handler.RoomData:
+    properties:
+      capacity:
+        type: integer
+      createdAt:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.ScheduleData:
+    properties:
+      daysOfWeek:
+        items:
+          type: integer
+        type: array
+      endTime:
+        type: string
+      roomId:
+        type: string
+      startTime:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.SlotData:
+    properties:
+      end:
+        type: string
+      roomId:
+        type: string
+      start:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  internship_internal_models_dto_handler.UserData:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      role:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/dummyLogin:
+    post:
+      consumes:
+      - application/json
+      description: Создает токен на основе переданной роли без пароля
+      parameters:
+      - description: Роль пользователя (admin, user)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internship_internal_models_dto_handler.DummyLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.InternalErrorResponse'
+      summary: Тестовый логин
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Вход по email и паролю для получения токена
+      parameters:
+      - description: Креды пользователя
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internship_internal_models_dto_handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+      summary: Авторизация
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя в системе
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internship_internal_models_dto_handler.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.InternalErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+  /bookings/{bookingID}/cancel:
+    post:
+      description: Отменяет бронирование по его ID
+      parameters:
+      - description: ID бронирования
+        in: path
+        name: bookingID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.CancelBookingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Отменить бронирование
+      tags:
+      - bookings
+  /bookings/create:
+    post:
+      consumes:
+      - application/json
+      description: Бронирует конкретный слот для авторизованного пользователя
+      parameters:
+      - description: Данные бронирования
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internship_internal_models_dto_handler.CreateBookingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.CreateBookingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Создать бронирование
+      tags:
+      - bookings
+  /bookings/list:
+    get:
+      description: Возвращает все бронирования с пагинацией
+      parameters:
+      - default: 1
+        description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Количество на странице
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.ListBookingsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Список всех бронирований
+      tags:
+      - bookings
+  /bookings/my:
+    get:
+      description: Возвращает список бронирований текущего пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Массив бронирований
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/internship_internal_models_dto_handler.BookingData'
+              type: array
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Мои бронирования
+      tags:
+      - bookings
+  /rooms/{roomID}/schedule/create:
+    post:
+      consumes:
+      - application/json
+      description: Задает график работы для комнаты
+      parameters:
+      - description: ID комнаты
+        in: path
+        name: roomID
+        required: true
+        type: string
+      - description: Данные расписания
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internship_internal_models_dto_handler.CreateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.CreateScheduleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.InternalErrorResponse'
+      summary: Создать расписание
+      tags:
+      - rooms
+  /rooms/{roomID}/slots/list:
+    get:
+      description: Возвращает свободные слоты для комнаты на конкретную дату
+      parameters:
+      - description: ID комнаты
+        in: path
+        name: roomID
+        required: true
+        type: string
+      - description: Дата в формате YYYY-MM-DD
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.ListSlotsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.InternalErrorResponse'
+      summary: Доступные слоты
+      tags:
+      - rooms
+  /rooms/create:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новую комнату
+      parameters:
+      - description: Данные комнаты
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internship_internal_models_dto_handler.CreateRoomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.CreateRoomResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.InternalErrorResponse'
+      summary: Создать комнату
+      tags:
+      - rooms
+  /rooms/list:
+    get:
+      description: Возвращает список всех доступных комнат
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internship_internal_models_dto_handler.ListRoomsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_http-server_handler.InternalErrorResponse'
+      summary: Список комнат
+      tags:
+      - rooms
+swagger: "2.0"
